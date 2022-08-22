@@ -64,7 +64,7 @@ static int i = 0;
 static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
   { WINDOW_CreateIndirect, "Window", ID_WINDOW_0, 0, 0, 240, 320, 0, 0x0, 0 },
   { TEXT_CreateIndirect, "Text", ID_TEXT_0, 0, 0, 240, 40, 0, 0x64, 0 },
-  { RADIO_CreateIndirect, "Radio", ID_RADIO_0, 20, 60, 200, 60, 0, 0x1e02, 0 },
+  { RADIO_CreateIndirect, "Radio", ID_RADIO_0, 20, 60, 90, 60, 0, 0x1e02, 0 },
   { PROGBAR_CreateIndirect, "Progbar", ID_PROGBAR_0, 20, 130, 200, 40, 0, 0x0, 0 },
   { BUTTON_CreateIndirect, "Button", ID_BUTTON_0, 20, 190, 90, 90, 0, 0x0, 0 },
   { BUTTON_CreateIndirect, "Button", ID_BUTTON_1, 130, 190, 90, 90, 0, 0x0, 0 },
