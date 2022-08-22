@@ -29,6 +29,7 @@
 //#include "lcd_work.h"
 #include "stdio.h"
 #include "ili9341.h"
+#include "XPT2046_touch.h"
 #include "GUI.h"
 /* USER CODE END Includes */
 
@@ -98,15 +99,15 @@ int main(void)
   /* USER CODE BEGIN 2 */
   HAL_GPIO_WritePin(LCD_BL_GPIO_Port, LCD_BL_Pin, GPIO_PIN_SET);
   GUI_Init();
-//  lcdBacklightOn();
-  GUI_SetColor(GUI_YELLOW);
-  GUI_SetBkColor(GUI_BLUE);
+  GUI_SetColor(GUI_BROWN);
+  GUI_SetBkColor(GUI_GRAY);
   GUI_Clear();
-  GUI_FillCircle(GUI_GetScreenSizeX() / 2, GUI_GetScreenSizeY() / 2, 100);
-  GUI_SetFont(&GUI_Font16B_1);
-  GUI_SetColor(GUI_RED);
-  GUI_SetBkColor(GUI_YELLOW);
-  GUI_DispStringHCenterAt("Hello, World!",GUI_GetScreenSizeX() / 2, GUI_GetScreenSizeY() / 2);
+//  GUI_FillCircle(GUI_GetScreenSizeX() / 2, GUI_GetScreenSizeY() / 2, 100);
+//  GUI_SetFont(&GUI_Font16B_1);
+//  GUI_SetColor(GUI_RED);
+//  GUI_SetBkColor(GUI_YELLOW);
+//  GUI_DispStringHCenterAt("Hello, World!",GUI_GetScreenSizeX() / 2, GUI_GetScreenSizeY() / 2);
+  GUI_SetPenSize(3);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -116,62 +117,6 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-
-//	  LCD_Init();
-//	  HAL_Delay(1000);
-//	  uint16_t lcd_id = LCD_GetID();
-//	  printf("LCD ID = 0x%x\r\n", lcd_id);
-//
-//	  uint8_t x = 0;
-//	  while(1)
-//	  {
-//		HAL_Delay(1000);
-//		switch(x)
-//		{
-//			case 0:LCD_Clear(WHITE);break;
-//			case 1:LCD_Clear(BLACK);break;
-//			case 2:LCD_Clear(BLUE);break;
-//			case 3:LCD_Clear(RED);break;
-//			case 4:LCD_Clear(MAGENTA);break;
-//			case 5:LCD_Clear(GREEN);break;
-//			case 6:LCD_Clear(CYAN);break;
-//			case 7:LCD_Clear(YELLOW);break;
-//			case 8:LCD_Clear(BRRED);break;
-//			case 9:LCD_Clear(GRAY);break;
-//			case 10:LCD_Clear(LGRAY);break;
-//			case 11:LCD_Clear(BROWN);break;
-//		}
-//
-//		for (int i = 0; i < 240; i++)
-//		{
-//			LCD_WritePixel(i, 160, YELLOW);
-//		}
-//
-//		LCD_Draw_Circle(120, 160, 40, BLUE);
-//
-//		LCD_DrawLine(10, 0, 10, 160, RED);
-//		LCD_DrawLine(230, 160, 230, 320, RED);
-//
-//		LCD_DrawRectangle(20, 20, 80, 80, BLACK);
-//		LCD_Fill(21, 21, 79, 79, WHITE);
-//
-//		for (int i = 0; i < 10; i++)
-//		{
-//			LCD_ShowChar(i*6, 0, '0' + i, 12, 0, BLACK, WHITE);
-//		}
-//
-//		for (int i = 0; i < 10; i++)
-//		{
-//			LCD_ShowChar(120, i*12, 'A' + i, 12, 0, WHITE, BLACK);
-//		}
-//
-//		LCD_ShowNum(200, 0, 65535, 5, 12, WHITE, BLACK);
-//
-//		LCD_ShowString(30,240,210,24,24,"TFT 240x320", WHITE, BLACK);
-//
-//		x++;
-//		if (x == 12) x = 0;
-//	  };
   }
   /* USER CODE END 3 */
 }
@@ -235,6 +180,23 @@ PUTCHAR_PROTOTYPE
 
   return ch;
 }
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+	if (GPIO_Pin == T_PEN_Pin)
+	{
+		if(XPT2046_TouchPressed())
+		{
+			uint16_t x, y;
+
+			if(XPT2046_TouchGetCoordinates(&x, &y))
+			{
+				GUI_DrawPoint(x, GUI_GetScreenSizeY() - y);
+			}
+		}
+	}
+}
+
 /* USER CODE END 4 */
 
 /**
