@@ -16,3 +16,11 @@ An example of setting up a project to include a library file:
 ![Image alt](https://github.com/NKP144/stm32_tft_lcd/blob/master/ScreenShots/Adding%20STemWin%20lib.png)
 
 When building with the STemWin library, the lsd_work.c file must be excluded from the build, otherwise there will be a conflict of function names.
+
+Window Screenshot:
+![Image alt](https://github.com/NKP144/stm32_tft_lcd/blob/master/ScreenShots/GUI%20Window.png)
+
+The window contains text, a radio buttons, checkboxes, progbar and buttons.
+When an element is clicked, the text at the top of the window displays the name of the clicked element. Сheckboxes control LEDs on the board.
+When you click on the buttons, the value of the progress bar increases or decreases.
+An arrow cursor is also displayed.
