@@ -379,10 +379,10 @@ void ili9341_Init(void)
   lcd_delay_us(1);
 
   ili9341_WriteReg(0x11);//Выйдем из спящего режим
-  HAL_Delay(150);
+  lcd_delay(150);
   ili9341_WriteReg(0x29);//Включение дисплея
   ili9341_WriteData(0x2C);
-  HAL_Delay(150);
+  lcd_delay(150);
 }
 
 /**
