@@ -32,4 +32,6 @@ For the mouse to work properly, you may need to change the HID_MOUSE_Info_TypeDe
 PID cursor control driver added for STemWin library. Used with API mouse driver.
 
 ### Video of GUI work:
-https://github.com/NKP144/stm32_tft_lcd/blob/master/ScreenShots/pid_usb_mouse.mp4
+https://user-images.githubusercontent.com/25184619/186236789-c0cad1a9-6cff-4943-9dfa-bbaf0ca0bf04.mp4
+
+
