@@ -13,9 +13,9 @@ GUI_PID_STATE mouse_pid_state;
 void modify_mouse_pid_state (HID_MOUSE_Info_TypeDef *mouse_info)
 {
 	mouse_pid_state.x += (int8_t)mouse_info->x;
-	if (mouse_pid_state.x > 240)		// Тут необходимо получить размер дисплея и ориентацию и сравнить по ним
+	if (mouse_pid_state.x > LCD_GetXSize())
 	{
-		mouse_pid_state.x = 240;
+		mouse_pid_state.x = LCD_GetXSize();
 	}
 	if (mouse_pid_state.x < 0)
 	{
@@ -23,9 +23,9 @@ void modify_mouse_pid_state (HID_MOUSE_Info_TypeDef *mouse_info)
 	}
 
 	mouse_pid_state.y += (int8_t)mouse_info->y;
-	if (mouse_pid_state.y > 320)
+	if (mouse_pid_state.y > LCD_GetYSize())
 	{
-		mouse_pid_state.y = 320;
+		mouse_pid_state.y = LCD_GetYSize();
 	}
 	if (mouse_pid_state.y < 0)
 	{
