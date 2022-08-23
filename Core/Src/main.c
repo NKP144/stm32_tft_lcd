@@ -21,6 +21,7 @@
 #include "crc.h"
 #include "rng.h"
 #include "usart.h"
+#include "usb_host.h"
 #include "gpio.h"
 #include "fsmc.h"
 
@@ -32,6 +33,9 @@
 #include "XPT2046_touch.h"
 #include "GUI.h"
 #include "WindowDLG.h"
+
+#include "usbh_hid.h"
+#include "pid_usb_mouse.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -53,10 +57,16 @@
 /* USER CODE BEGIN PV */
 uint16_t x, y;
 GUI_PID_STATE tsState;
+
+static int32_t uart_length=0;
+uint8_t uart_tx_buffer[200];
+extern HID_MOUSE_Info_TypeDef mouse_info;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
+void MX_USB_HOST_Process(void);
+
 /* USER CODE BEGIN PFP */
 #define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
 /* USER CODE END PFP */
@@ -98,6 +108,7 @@ int main(void)
   MX_RNG_Init();
   MX_USART1_UART_Init();
   MX_CRC_Init();
+  MX_USB_HOST_Init();
   /* USER CODE BEGIN 2 */
   HAL_GPIO_WritePin(LCD_BL_GPIO_Port, LCD_BL_Pin, GPIO_PIN_SET);
   GUI_Init();
@@ -108,12 +119,6 @@ int main(void)
 //  GUI_Clear();
 //  GUI_SetPenSize(3);
 
-//  GUI_FillCircle(GUI_GetScreenSizeX() / 2, GUI_GetScreenSizeY() / 2, 100);
-//  GUI_SetFont(&GUI_Font16B_1);
-//  GUI_SetColor(GUI_RED);
-//  GUI_SetBkColor(GUI_YELLOW);
-//  GUI_DispStringHCenterAt("Hello, World!",GUI_GetScreenSizeX() / 2, GUI_GetScreenSizeY() / 2);
-
   GUI_CURSOR_Show();
 
   /* USER CODE END 2 */
@@ -123,9 +128,10 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
+    MX_USB_HOST_Process();
 
     /* USER CODE BEGIN 3 */
-	  GUI_Exec();
+	GUI_Exec();
   }
   /* USER CODE END 3 */
 }
@@ -190,6 +196,9 @@ PUTCHAR_PROTOTYPE
   return ch;
 }
 
+/*GPIO EXTI
+ * TOUCH + Buttons
+ * */
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
 	if (GPIO_Pin == T_PEN_Pin)
@@ -214,6 +223,41 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 		}
 
 		GUI_TOUCH_StoreStateEx(&tsState);
+	}
+}
+
+/*USB HID Callback*/
+void USBH_HID_EventCallback(USBH_HandleTypeDef *phost)
+{
+	HID_KEYBD_Info_TypeDef *keybd_info;
+	uint8_t keycode;
+	HID_HandleTypeDef *HID_Handle = (HID_HandleTypeDef *)phost->pActiveClass->pData;
+	if (HID_Handle->Init == USBH_HID_KeybdInit)
+	{
+		keybd_info = USBH_HID_GetKeybdInfo(phost);
+		keycode = USBH_HID_GetASCIICode(keybd_info);
+//		uart_length = sprintf(uart_tx_buffer, "Key pressed: 0x%x\r\n", keycode);
+//		HAL_UART_Transmit(&huart1, uart_tx_buffer, uart_length, 1000);
+		printf("Key pressed: 0x%x\r\n", keycode);
+	}
+	else if (HID_Handle->Init == USBH_HID_MouseInit)
+	{
+		USBH_HID_GetMouseInfo(phost);
+//		uart_length = sprintf(uart_tx_buffer,
+//							  "Mouse action:\r\nx = %d, y = %d\r\n"
+//							  "button1 = %d, button2 = %d, button3 = %d, button4 = %d, button5 = %d\r\n"
+//							  "wheel = %d\r\n\r\n",
+//							  (int8_t)mouse_info.x, (int8_t)mouse_info.y,
+//							  mouse_info.buttons[0], mouse_info.buttons[1], mouse_info.buttons[2], mouse_info.buttons[3], mouse_info.buttons[4],
+//							  (int8_t)mouse_info.wheel);
+//	HAL_UART_Transmit(&huart1, uart_tx_buffer, uart_length, 1000);
+		printf("Mouse action:\r\nx = %d, y = %d\r\n"
+						  "button1 = %d, button2 = %d, button3 = %d, button4 = %d, button5 = %d\r\n"
+						  "wheel = %d\r\n\r\n",
+						  (int8_t)mouse_info.x, (int8_t)mouse_info.y,
+						  mouse_info.buttons[0], mouse_info.buttons[1], mouse_info.buttons[2], mouse_info.buttons[3], mouse_info.buttons[4],
+						  (int8_t)mouse_info.wheel);
+		modify_mouse_pid_state(&mouse_info);
 	}
 }
 
