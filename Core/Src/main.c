@@ -101,12 +101,12 @@ int main(void)
   /* USER CODE BEGIN 2 */
   HAL_GPIO_WritePin(LCD_BL_GPIO_Port, LCD_BL_Pin, GPIO_PIN_SET);
   GUI_Init();
-  CreateWindow();
+//  CreateWindow();
 
-//  GUI_SetColor(GUI_BROWN);
-//  GUI_SetBkColor(GUI_GRAY);
-//  GUI_Clear();
-//  GUI_SetPenSize(3);
+  GUI_SetColor(GUI_BROWN);
+  GUI_SetBkColor(GUI_GRAY);
+  GUI_Clear();
+  GUI_SetPenSize(3);
 
 //  GUI_FillCircle(GUI_GetScreenSizeX() / 2, GUI_GetScreenSizeY() / 2, 100);
 //  GUI_SetFont(&GUI_Font16B_1);
@@ -114,7 +114,7 @@ int main(void)
 //  GUI_SetBkColor(GUI_YELLOW);
 //  GUI_DispStringHCenterAt("Hello, World!",GUI_GetScreenSizeX() / 2, GUI_GetScreenSizeY() / 2);
 
-  GUI_CURSOR_Show();
+//  GUI_CURSOR_Show();
 
   /* USER CODE END 2 */
 
@@ -196,24 +196,12 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	{
 		if(XPT2046_TouchPressed())
 		{
-			tsState.Pressed = true;
-
 			uint16_t x, y;
 			if(XPT2046_TouchGetCoordinates(&x, &y))
 			{
-				tsState.x = x;
-				tsState.y = GUI_GetScreenSizeY() - y;
-				//GUI_DrawPoint(x, GUI_GetScreenSizeY() - y);
+				GUI_DrawPoint(x, GUI_GetScreenSizeY() - y);
 			}
 		}
-		else
-		{
-			tsState.Pressed = false;
-			tsState.x = -1;
-			tsState.y = -1;
-		}
-
-		GUI_TOUCH_StoreStateEx(&tsState);
 	}
 }
 
