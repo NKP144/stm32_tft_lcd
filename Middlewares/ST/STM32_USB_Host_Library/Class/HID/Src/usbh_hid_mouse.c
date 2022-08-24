@@ -207,7 +207,6 @@ static const HID_Report_ItemTypedef prop_wheel =
   1      /*resolution*/
 };
 
-
 /**
   * @}
   */

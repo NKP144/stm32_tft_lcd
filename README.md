@@ -34,4 +34,12 @@ PID cursor control driver added for STemWin library. Used with API mouse driver.
 ### Video of GUI work:
 https://user-images.githubusercontent.com/25184619/186236789-c0cad1a9-6cff-4943-9dfa-bbaf0ca0bf04.mp4
 
+## Adding RTOS (FreeRTOS)
+### USB HOST setup
+In order to use RTOS, USBH_PROCESS_STACK_SIZE must be configured. I have it equal to (uint16_t) 2048.
+### STemWin setup
+1. It is necessary to connect another library, the file name must contain OS. I used STemWin_CM4_OS_wc32.a.
+2. STemWin uses CMSIS RTOS API v1.
+3. Instead of the GUI _X.c file, you must use GUI_X_OS.c
+4. OS_SUPPORT must be declared in GUIConf.h.
 

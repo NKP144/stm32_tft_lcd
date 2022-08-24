@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "cmsis_os.h"
 #include "crc.h"
 #include "rng.h"
 #include "usart.h"
@@ -65,8 +66,7 @@ extern HID_MOUSE_Info_TypeDef mouse_info;
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
-void MX_USB_HOST_Process(void);
-
+void MX_FREERTOS_Init(void);
 /* USER CODE BEGIN PFP */
 #define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
 /* USER CODE END PFP */
@@ -108,30 +108,34 @@ int main(void)
   MX_RNG_Init();
   MX_USART1_UART_Init();
   MX_CRC_Init();
-  MX_USB_HOST_Init();
   /* USER CODE BEGIN 2 */
   HAL_GPIO_WritePin(LCD_BL_GPIO_Port, LCD_BL_Pin, GPIO_PIN_SET);
-  GUI_Init();
-  CreateWindow();
+//  GUI_Init();
+//  CreateWindow();
 
 //  GUI_SetColor(GUI_BROWN);
 //  GUI_SetBkColor(GUI_GRAY);
 //  GUI_Clear();
 //  GUI_SetPenSize(3);
 
-  GUI_CURSOR_Show();
+//  GUI_CURSOR_Show();
 
   /* USER CODE END 2 */
 
+  /* Call init function for freertos objects (in freertos.c) */
+  MX_FREERTOS_Init();
+
+  /* Start scheduler */
+  osKernelStart();
+
+  /* We should never get here as control is now taken by the scheduler */
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
     /* USER CODE END WHILE */
-    MX_USB_HOST_Process();
 
     /* USER CODE BEGIN 3 */
-	GUI_Exec();
   }
   /* USER CODE END 3 */
 }
@@ -243,14 +247,6 @@ void USBH_HID_EventCallback(USBH_HandleTypeDef *phost)
 	else if (HID_Handle->Init == USBH_HID_MouseInit)
 	{
 		USBH_HID_GetMouseInfo(phost);
-//		uart_length = sprintf(uart_tx_buffer,
-//							  "Mouse action:\r\nx = %d, y = %d\r\n"
-//							  "button1 = %d, button2 = %d, button3 = %d, button4 = %d, button5 = %d\r\n"
-//							  "wheel = %d\r\n\r\n",
-//							  (int8_t)mouse_info.x, (int8_t)mouse_info.y,
-//							  mouse_info.buttons[0], mouse_info.buttons[1], mouse_info.buttons[2], mouse_info.buttons[3], mouse_info.buttons[4],
-//							  (int8_t)mouse_info.wheel);
-//	HAL_UART_Transmit(&huart1, uart_tx_buffer, uart_length, 1000);
 		printf("Mouse action:\r\nx = %d, y = %d\r\n"
 						  "button1 = %d, button2 = %d, button3 = %d, button4 = %d, button5 = %d\r\n"
 						  "wheel = %d\r\n\r\n",
@@ -262,6 +258,27 @@ void USBH_HID_EventCallback(USBH_HandleTypeDef *phost)
 }
 
 /* USER CODE END 4 */
+
+/**
+  * @brief  Period elapsed callback in non blocking mode
+  * @note   This function is called  when TIM1 interrupt took place, inside
+  * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
+  * a global variable "uwTick" used as application time base.
+  * @param  htim : TIM handle
+  * @retval None
+  */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  /* USER CODE BEGIN Callback 0 */
+
+  /* USER CODE END Callback 0 */
+  if (htim->Instance == TIM1) {
+    HAL_IncTick();
+  }
+  /* USER CODE BEGIN Callback 1 */
+
+  /* USER CODE END Callback 1 */
+}
 
 /**
   * @brief  This function is executed in case of error occurrence.
