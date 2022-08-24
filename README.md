@@ -43,3 +43,12 @@ In order to use RTOS, USBH_PROCESS_STACK_SIZE must be configured. I have it equa
 3. Instead of the GUI _X.c file, you must use GUI_X_OS.c
 4. OS_SUPPORT must be declared in GUIConf.h.
 
+## Added saving display image to USB FLASH
+The code is on the drawing branch. 
+The GUI_BMP_SerializeExBpp() function is used for saving. The BitsPerPixel parameter requires a per-color depth. I used GUICC_565 = RGB565, 2 bpp encoding.
+
+![man](https://user-images.githubusercontent.com/25184619/186511480-dac04318-2d03-4f05-b5f7-205897575a7d.png)
+![0](https://user-images.githubusercontent.com/25184619/186513298-cc71f3e3-f219-4247-badc-de6b85976f0e.png)
+
+
+
