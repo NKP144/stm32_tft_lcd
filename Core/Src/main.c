@@ -19,8 +19,10 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "crc.h"
+#include "fatfs.h"
 #include "rng.h"
 #include "usart.h"
+#include "usb_host.h"
 #include "gpio.h"
 #include "fsmc.h"
 
@@ -57,6 +59,8 @@ GUI_PID_STATE tsState;
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
+void MX_USB_HOST_Process(void);
+
 /* USER CODE BEGIN PFP */
 #define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
 /* USER CODE END PFP */
@@ -98,6 +102,8 @@ int main(void)
   MX_RNG_Init();
   MX_USART1_UART_Init();
   MX_CRC_Init();
+  MX_USB_HOST_Init();
+  MX_FATFS_Init();
   /* USER CODE BEGIN 2 */
   HAL_GPIO_WritePin(LCD_BL_GPIO_Port, LCD_BL_Pin, GPIO_PIN_SET);
   GUI_Init();
@@ -123,9 +129,11 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
+    MX_USB_HOST_Process();
 
     /* USER CODE BEGIN 3 */
-	  GUI_Exec();
+	GUI_Exec();
+	userFunction();
   }
   /* USER CODE END 3 */
 }
