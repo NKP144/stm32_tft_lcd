@@ -46,17 +46,24 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
-
+osThreadId USBTaskHandle;
+osThreadId PoolButtonTaskHandle;
 /* USER CODE END Variables */
 osThreadId defaultTaskHandle;
 osMutexId myMutex01Handle;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
+void USBTask(void const * argument);
+void PoolButtonTask(void const * argument);
 
+void GUI_Button_SignalEvent(void);
+void GUI_Button_WaitEvent(void);
 /* USER CODE END FunctionPrototypes */
 
 void StartDefaultTask(void const * argument);
+
+
 
 extern void MX_USB_HOST_Init(void);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
@@ -114,7 +121,11 @@ void MX_FREERTOS_Init(void) {
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
-  /* add threads, ... */
+  osThreadDef(usbTask, USBTask, osPriorityNormal, 0, 1024);
+  USBTaskHandle = osThreadCreate(osThread(usbTask), NULL);
+
+  osThreadDef(poolbuttonTask, PoolButtonTask, osPriorityNormal, 0, 128);
+  PoolButtonTaskHandle = osThreadCreate(osThread(poolbuttonTask), NULL);
   /* USER CODE END RTOS_THREADS */
 
 }
@@ -128,22 +139,63 @@ void MX_FREERTOS_Init(void) {
 /* USER CODE END Header_StartDefaultTask */
 void StartDefaultTask(void const * argument)
 {
-  /* init code for USB_HOST */
-  MX_USB_HOST_Init();
   /* USER CODE BEGIN StartDefaultTask */
   GUI_Init();
   CreateWindow();
   GUI_CURSOR_Show();
-  /* Infinite loop */
+
+   /* Infinite loop */
   for(;;)
   {
 	GUI_Exec();
-    osDelay(1);
+	GUI_X_ExecIdle();
   }
   /* USER CODE END StartDefaultTask */
 }
 
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
+
+void USBTask (void const * argument)
+{
+	/* init code for USB_HOST */
+	MX_USB_HOST_Init();
+
+	for(;;)
+	{
+	  osDelay(1);
+	}
+}
+
+void PoolButtonTask (void const * argument)
+{
+	GUI_SetSignalEventFunc(GUI_Button_SignalEvent);
+	GUI_SetWaitEventFunc(GUI_Button_WaitEvent);
+
+	for(;;)
+	{
+	  if (HAL_GPIO_ReadPin (KEY1_GPIO_Port, KEY1_Pin) == GPIO_PIN_RESET) // Button press
+	  {
+		  GUI_Button_SignalEvent();
+	  }
+	  if (HAL_GPIO_ReadPin (KEY0_GPIO_Port, KEY0_Pin) == GPIO_PIN_RESET) // Button press
+	  {
+		  GUI_Button_SignalEvent();
+	  }
+
+	  osDelay(1);
+	}
+}
+
+void GUI_Button_SignalEvent(void)
+{
+
+}
+
+void GUI_Button_WaitEvent(void)
+{
+
+}
+
 
 /* USER CODE END Application */
